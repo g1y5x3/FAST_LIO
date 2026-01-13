@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.8)
 project(fast_lio)
 
+if(POLICY CMP0074)
+  cmake_policy(SET CMP0074 NEW)
+endif()
+
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -10,6 +14,7 @@ ADD_COMPILE_OPTIONS(-std=c++14)
 set(CMAKE_CXX_FLAGS "-std=c++14 -O3")
 
 add_definitions(-DROOT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\")
+add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fexceptions")
 set(CMAKE_CXX_STANDARD 14)
@@ -59,7 +64,7 @@ find_package(std_srvs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(pcl_ros REQUIRED)
 find_package(pcl_conversions REQUIRED)
-find_package(livox_ros_driver2 REQUIRED)
+# find_package(livox_ros_driver2 REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 set(dependencies
@@ -73,7 +78,7 @@ set(dependencies
   visualization_msgs
   pcl_ros
   pcl_conversions
-  livox_ros_driver2
+  # livox_ros_driver2
 )
 
 # Thirdparty libraries

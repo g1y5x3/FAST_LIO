@@ -44,11 +44,13 @@ void Preprocess::set(bool feat_en, int lid_type, double bld, int pfilt_num)
   point_filter_num = pfilt_num;
 }
 
+/*
 void Preprocess::process(const livox_ros_driver2::msg::CustomMsg::UniquePtr &msg, PointCloudXYZI::Ptr& pcl_out)
 {
   avia_handler(msg);
   *pcl_out = pl_surf;
 }
+*/
 
 void Preprocess::process(const sensor_msgs::msg::PointCloud2::UniquePtr &msg, PointCloudXYZI::Ptr& pcl_out)
 {
@@ -92,6 +94,7 @@ void Preprocess::process(const sensor_msgs::msg::PointCloud2::UniquePtr &msg, Po
   *pcl_out = pl_surf;
 }
 
+/*
 void Preprocess::avia_handler(const livox_ros_driver2::msg::CustomMsg::UniquePtr &msg)
 {
   pl_surf.clear();
@@ -192,6 +195,7 @@ void Preprocess::avia_handler(const livox_ros_driver2::msg::CustomMsg::UniquePtr
     }
   }
 }
+*/
 
 void Preprocess::oust64_handler(const sensor_msgs::msg::PointCloud2::UniquePtr &msg)
 {
@@ -466,8 +470,14 @@ void Preprocess::velodyne_handler(const sensor_msgs::msg::PointCloud2::UniquePtr
       {
         if (added_pt.x * added_pt.x + added_pt.y * added_pt.y + added_pt.z * added_pt.z > (blind * blind))
         {
-          pl_surf.points.push_back(added_pt);
-        }
+                    // Filter out points above 2.0 meters (LiDAR frame)
+                    if (added_pt.z > 2.0) continue;
+
+                    // Filter out points in the rear 30-degree cone (approx +-15 deg around 180)
+                    // 15 deg ~= 0.26 rad. PI - 0.26 = 2.88
+                    // if (std::abs(atan2(added_pt.y, added_pt.x)) > 2.88) continue;
+
+                    pl_surf.points.push_back(added_pt);        }
       }
     }
   }
