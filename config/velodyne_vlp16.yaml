@@ -27,8 +27,8 @@
             gyr_cov: 0.1
             b_acc_cov: 0.0001
             b_gyr_cov: 0.0001
-            fov_degree:    360.0
-            det_range:     80.0
+            fov_degree: 360.0
+            det_range: 80.0
             extrinsic_est_en:  true      # Online refinement of extrinsics
             # Transform from LiDAR to IMU
             extrinsic_T: [-0.186, 0.000, 0.086]
