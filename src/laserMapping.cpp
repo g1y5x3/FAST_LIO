@@ -44,6 +44,7 @@
 #include <so3_math.h>
 #include <rclcpp/rclcpp.hpp>
 #include <Eigen/Core>
+#include <algorithm>
 #include "IMU_Processing.hpp"
 #include <nav_msgs/msg/odometry.hpp>
 #include <nav_msgs/msg/path.hpp>
@@ -278,6 +279,12 @@ void lasermap_fov_segment()
     double delete_begin = omp_get_wtime();
     if(cub_needrm.size() > 0) kdtree_delete_counter = ikdtree.Delete_Point_Boxes(cub_needrm);
     kdtree_delete_time = omp_get_wtime() - delete_begin;
+}
+
+bool point_cmp(const PointType& a, const PointType& b) {
+    if (a.x != b.x) return a.x < b.x;
+    if (a.y != b.y) return a.y < b.y;
+    return a.z < b.z;
 }
 
 void standard_pcl_cbk(const sensor_msgs::msg::PointCloud2::UniquePtr msg) 
@@ -996,6 +1003,7 @@ private:
             /*** downsample the feature points in a scan ***/
             downSizeFilterSurf.setInputCloud(feats_undistort);
             downSizeFilterSurf.filter(*feats_down_body);
+            std::sort(feats_down_body->points.begin(), feats_down_body->points.end(), point_cmp);
             t1 = omp_get_wtime();
             feats_down_size = feats_down_body->points.size();
             /*** initialize the map kdtree ***/
