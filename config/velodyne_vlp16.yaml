@@ -2,12 +2,12 @@
     ros__parameters:
         feature_extract_enable: false
         point_filter_num: 2
-        max_iteration: 3
+        max_iteration: 5
         filter_size_surf: 0.5
         filter_size_map: 0.5
         cube_side_length: 1000.0
         runtime_pos_log_enable: true
-        map_file_path: "./mine_map3_test.pcd"
+        map_file_path: "./mine_map3_test_0.pcd"
 
         common:
             lid_topic:  "/velodyne_points"
@@ -29,7 +29,7 @@
             b_gyr_cov: 0.0001
             fov_degree: 360.0
             det_range: 80.0
-            extrinsic_est_en:  true      # Online refinement of extrinsics
+            extrinsic_est_en:  false      # Online refinement of extrinsics
             # Transform from LiDAR to IMU
             extrinsic_T: [-0.186, 0.000, 0.086]
             extrinsic_R: [1.0, 0.0, 0.0,
