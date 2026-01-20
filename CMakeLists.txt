@@ -83,7 +83,11 @@ set(dependencies
 
 # Thirdparty libraries
 find_package(Eigen3 REQUIRED)
-find_package(PCL REQUIRED COMPONENTS common io segmentation filters kdtree search)
+find_package(PCL REQUIRED COMPONENTS common io segmentation filters kdtree search registration)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_eigen REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
 message(Eigen: ${EIGEN3_INCLUDE_DIR})
 message(STATUS "PCL: ${PCL_INCLUDE_DIRS}")
@@ -115,6 +119,16 @@ target_include_directories(global_map_server PUBLIC
 target_link_libraries(global_map_server ${PCL_LIBRARIES})
 ament_target_dependencies(global_map_server ${dependencies})
 
+add_executable(localization_node src/localization.cpp)
+target_include_directories(localization_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${PCL_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIR}
+)
+target_link_libraries(localization_node ${PCL_LIBRARIES} Eigen3::Eigen)
+ament_target_dependencies(localization_node ${dependencies} tf2 tf2_ros tf2_eigen tf2_geometry_msgs)
+
 list(APPEND EOL_LIST "foxy" "galactic" "eloquent" "dashing" "crystal")
 
 if($ENV{ROS_DISTRO} IN_LIST EOL_LIST)
@@ -130,7 +144,7 @@ endif()
 ament_target_dependencies(fastlio_mapping ${dependencies})
 
 # ---------------- Install --------------- #
-install(TARGETS fastlio_mapping global_map_server
+install(TARGETS fastlio_mapping global_map_server localization_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

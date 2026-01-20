@@ -52,7 +52,7 @@ void GlobalMapServer::loadAndFilterMap()
   }
 
   RCLCPP_INFO(this->get_logger(), "Loading map from: %s", this->map_path_.c_str());
-  
+
   // Load as PointXYZ first (since the file might not have intensity)
   pcl::PointCloud<pcl::PointXYZ>::Ptr raw_map_xyz(new pcl::PointCloud<pcl::PointXYZ>());
 
