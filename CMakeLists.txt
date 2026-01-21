@@ -149,7 +149,7 @@ install(TARGETS fastlio_mapping global_map_server localization_node
 )
 
 install(
-  DIRECTORY config launch rviz PCD
+  DIRECTORY config launch rviz pcd
   DESTINATION share/${PROJECT_NAME}
 )
 

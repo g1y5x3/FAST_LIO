@@ -14,7 +14,7 @@ def generate_launch_description():
         'map_path',
         default_value=os.path.join(
             get_package_share_directory(package_name), 
-            'PCD', 
+            'pcd', 
             'mine_map3_final_clean.pcd'
         ),
         description='Path to the global PCD map file'
