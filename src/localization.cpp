@@ -105,14 +105,8 @@ void LocalizationNode::scanCallback(const sensor_msgs::msg::PointCloud2::ConstSh
   // If we haven't received an initial pose yet, we can't localize
   // (unless we assume start at 0,0,0, but usually we wait)
   if (!this->initial_pose_received_) {
-      // Optional: Auto-initialize at origin if desired
-      // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Waiting for initial pose...");
-      // return; 
-
-      // For now, let's assume we start at Identity if not told otherwise, 
-      // or rely on the user to click "2D Pose Estimate".
-      // Let's default to trusting the odom starts near map origin.
-      this->initial_pose_received_ = true; 
+      RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000, "Waiting for initial pose...");
+      return; 
   }
 
   pcl::PointCloud<PointType>::Ptr scan(new pcl::PointCloud<PointType>());

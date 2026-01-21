@@ -62,7 +62,7 @@ private:
   Eigen::Matrix4f map_to_odom_; // Transform from map -> odom (camera_init)
   Eigen::Matrix4f odom_to_base_; // Current odom -> base_link
   bool map_initialized_ = false;
-  bool initial_pose_received_ = true;
+  bool initial_pose_received_ = false;
   
   // Buffers
   std::mutex mutex_;
