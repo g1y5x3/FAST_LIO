@@ -26,6 +26,12 @@ def generate_launch_description():
         description='Use simulation (bag) time if true'
     )
 
+    publish_goals_arg = DeclareLaunchArgument(
+        'publish_goals',
+        default_value='false',
+        description='Whether to publish goal markers from goals.yaml'
+    )
+
     config_file_arg = DeclareLaunchArgument(
         'config_file',
         default_value='velodyne_vlp16.yaml',
@@ -89,6 +95,17 @@ def generate_launch_description():
         ]
     )
 
+    # 4. Goal Publisher (Optional)
+    from launch.conditions import IfCondition
+    goal_publisher_node = Node(
+        package=package_name,
+        executable='publish_goals.py',
+        name='goal_publisher',
+        output='screen',
+        condition=IfCondition(LaunchConfiguration('publish_goals')),
+        parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}]
+    )
+
     # RViz
     rviz_node = Node(
         package='rviz2',
@@ -102,9 +119,11 @@ def generate_launch_description():
     return LaunchDescription([
         map_path_arg,
         use_sim_time_arg,
+        publish_goals_arg,
         config_file_arg,
         map_server_node,
         fast_lio_node,
         localization_node,
+        goal_publisher_node,
         rviz_node
     ])

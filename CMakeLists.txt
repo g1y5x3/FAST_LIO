@@ -148,8 +148,13 @@ install(TARGETS fastlio_mapping global_map_server localization_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
+install(PROGRAMS
+  scripts/publish_goals.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 install(
-  DIRECTORY config launch rviz pcd
+  DIRECTORY config launch rviz pcd scripts
   DESTINATION share/${PROJECT_NAME}
 )
 
