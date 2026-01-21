@@ -15,8 +15,9 @@ GlobalMapServer::GlobalMapServer() : Node("global_map_server_node")
   // PMF Parameters
   this->declare_parameter<bool>("use_pmf", true);
   this->declare_parameter<double>("pmf_max_window_size", 10.0);
-  this->declare_parameter<double>("pmf_slope", 0.7);
-  this->declare_parameter<double>("pmf_initial_distance", 0.5);
+  // TODO: tune these defaults later
+  this->declare_parameter<double>("pmf_slope", 2.5);
+  this->declare_parameter<double>("pmf_initial_distance", 0.8);
   this->declare_parameter<double>("pmf_max_distance", 1.0);
 
   this->get_parameter("map_path", this->map_path_);
