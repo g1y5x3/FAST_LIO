@@ -1,5 +1,10 @@
 /**:
     ros__parameters:
+        # frame id settings
+        odom_frame_id: "camera_init"
+        base_frame_id: "base_link"
+
+        # icp settings
         feature_extract_enable: false
         point_filter_num: 2
         max_iteration: 5
@@ -51,8 +56,6 @@
 
         localization:
             global_frame_id: "map"
-            odom_frame_id: "camera_init"
-            base_frame_id: "base_link"
             ndt_resolution: 1.0
             ndt_step_size: 0.1
             ndt_trans_epsilon: 0.01
