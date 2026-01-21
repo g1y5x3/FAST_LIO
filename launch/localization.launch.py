@@ -32,59 +32,30 @@ def generate_launch_description():
         description='FAST-LIO config file name (must be in config folder)'
     )
 
-    # PMF Parameters
-    use_pmf_arg = DeclareLaunchArgument(
-        'use_pmf',
-        default_value='true',
-        description='Use PMF for ground segmentation'
-    )
-    pmf_max_window_size_arg = DeclareLaunchArgument(
-        'pmf_max_window_size',
-        default_value='5.0',
-        description='PMF max window size'
-    )
-    pmf_slope_arg = DeclareLaunchArgument(
-        'pmf_slope',
-        default_value='1.0',
-        description='PMF slope'
-    )
-    pmf_initial_distance_arg = DeclareLaunchArgument(
-        'pmf_initial_distance',
-        default_value='0.8',
-        description='PMF initial distance'
-    )
-    pmf_max_distance_arg = DeclareLaunchArgument(
-        'pmf_max_distance',
-        default_value='1.0',
-        description='PMF max distance'
-    )
-
     # 1. Global Map Server
-    map_server_node = Node(
-        package=package_name,
-        executable='global_map_server',
-        name='global_map_server',
-        output='screen',
-        parameters=[{
-            'map_path': LaunchConfiguration('map_path'),
-            'map_frame_id': 'map',
-            'use_sim_time': LaunchConfiguration('use_sim_time'),
-            'use_pmf': LaunchConfiguration('use_pmf'),
-            'pmf_max_window_size': LaunchConfiguration('pmf_max_window_size'),
-            'pmf_slope': LaunchConfiguration('pmf_slope'),
-            'pmf_initial_distance': LaunchConfiguration('pmf_initial_distance'),
-            'pmf_max_distance': LaunchConfiguration('pmf_max_distance'),
-        }]
-    )
-
-    # 2. FAST-LIO (Odometry Mode)
-    # We load the YAML file but override specific params for localization mode
+    # load the YAML file but override specific params for localization mode
     fast_lio_config_path = PathJoinSubstitution([
         get_package_share_directory(package_name),
         'config',
         LaunchConfiguration('config_file')
     ])
 
+    map_server_node = Node(
+        package=package_name,
+        executable='global_map_server',
+        name='global_map_server',
+        output='screen',
+        parameters=[
+            fast_lio_config_path,
+            {
+                'map_path': LaunchConfiguration('map_path'),
+                'map_frame_id': 'map',
+                'use_sim_time': LaunchConfiguration('use_sim_time')
+            }
+        ]
+    )
+
+    # 2. FAST-LIO (Odometry Mode)
     fast_lio_node = Node(
         package=package_name,
         executable='fastlio_mapping',
@@ -136,11 +107,6 @@ def generate_launch_description():
         map_path_arg,
         use_sim_time_arg,
         config_file_arg,
-        use_pmf_arg,
-        pmf_max_window_size_arg,
-        pmf_slope_arg,
-        pmf_initial_distance_arg,
-        pmf_max_distance_arg,
         map_server_node,
         fast_lio_node,
         localization_node,

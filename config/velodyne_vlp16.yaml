@@ -35,6 +35,12 @@
             extrinsic_R: [1.0, 0.0, 0.0,
                           0.0, 1.0, 0.0,
                           0.0, 0.0, 1.0]
+        localization:
+            use_pmf: true
+            pmf_max_window_size: 5.0
+            pmf_slope: 1.0
+            pmf_initial_distance: 0.8
+            pmf_max_distance: 1.0
 
         publish:
             path_en:  true
