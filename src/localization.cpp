@@ -8,21 +8,21 @@ LocalizationNode::LocalizationNode() : Node("localization_node")
   RCLCPP_INFO(this->get_logger(), "Initializing FAST-LIO Localization Node");
 
   // Parameters
-  this->declare_parameter<std::string>("global_frame_id", "map");
-  this->declare_parameter<std::string>("odom_frame_id", "camera_init");
-  this->declare_parameter<std::string>("base_frame_id", "base_link");
-  this->declare_parameter<double>("ndt_resolution", 1.0);
-  this->declare_parameter<double>("ndt_step_size", 0.1);
-  this->declare_parameter<double>("ndt_trans_epsilon", 0.01);
-  this->declare_parameter<int>("ndt_max_iter", 30);
+  this->declare_parameter<std::string>("localization.global_frame_id", "map");
+  this->declare_parameter<std::string>("localization.odom_frame_id", "camera_init");
+  this->declare_parameter<std::string>("localization.base_frame_id", "base_link");
+  this->declare_parameter<double>("localization.ndt_resolution", 1.0);
+  this->declare_parameter<double>("localization.ndt_step_size", 0.1);
+  this->declare_parameter<double>("localization.ndt_trans_epsilon", 0.01);
+  this->declare_parameter<int>("localization.ndt_max_iter", 30);
 
-  this->get_parameter("global_frame_id", this->global_frame_id_);
-  this->get_parameter("odom_frame_id", this->odom_frame_id_);
-  this->get_parameter("base_frame_id", this->base_frame_id_);
-  this->get_parameter("ndt_resolution", this->ndt_resolution_);
-  this->get_parameter("ndt_step_size", this->ndt_step_size_);
-  this->get_parameter("ndt_trans_epsilon", this->ndt_trans_epsilon_);
-  this->get_parameter("ndt_max_iter", this->ndt_max_iter_);
+  this->get_parameter("localization.global_frame_id", this->global_frame_id_);
+  this->get_parameter("localization.odom_frame_id", this->odom_frame_id_);
+  this->get_parameter("localization.base_frame_id", this->base_frame_id_);
+  this->get_parameter("localization.ndt_resolution", this->ndt_resolution_);
+  this->get_parameter("localization.ndt_step_size", this->ndt_step_size_);
+  this->get_parameter("localization.ndt_trans_epsilon", this->ndt_trans_epsilon_);
+  this->get_parameter("localization.ndt_max_iter", this->ndt_max_iter_);
 
   // TF
   this->tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);

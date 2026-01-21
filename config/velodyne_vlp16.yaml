@@ -36,6 +36,10 @@
                           0.0, 1.0, 0.0,
                           0.0, 0.0, 1.0]
 
+        pcd_save:
+            pcd_save_en: true
+            interval: -1
+
         global_map:
             map_frame_id: "map"
             map_leaf_size: 0.1
@@ -45,13 +49,11 @@
             pmf_initial_distance: 0.8
             pmf_max_distance: 1.0
 
-        publish:
-            path_en:  true
-            scan_publish_en:  true
-            dense_publish_en: true
-            scan_bodyframe_pub_en: true
-            map_en: true
-
-        pcd_save:
-            pcd_save_en: true
-            interval: -1
+        localization:
+            global_frame_id: "map"
+            odom_frame_id: "camera_init"
+            base_frame_id: "base_link"
+            ndt_resolution: 1.0
+            ndt_step_size: 0.1
+            ndt_trans_epsilon: 0.01
+            ndt_max_iter: 30

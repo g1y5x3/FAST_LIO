@@ -81,15 +81,12 @@ def generate_launch_description():
         executable='localization_node',
         name='localization_node',
         output='screen',
-        parameters=[{
-            'use_sim_time': LaunchConfiguration('use_sim_time'),
-            'global_frame_id': 'map',
-            'odom_frame_id': 'camera_init',
-            'base_frame_id': 'base_link',
-            'ndt_resolution': 1.0,
-            'ndt_step_size': 0.1,
-            'ndt_max_iter': 30
-        }]
+        parameters=[
+            fast_lio_config_path,
+            {
+                'use_sim_time': LaunchConfiguration('use_sim_time')
+            }
+        ]
     )
 
     # RViz
