@@ -49,7 +49,6 @@ def generate_launch_description():
             fast_lio_config_path,
             {
                 'map_path': LaunchConfiguration('map_path'),
-                'map_frame_id': 'map',
                 'use_sim_time': LaunchConfiguration('use_sim_time')
             }
         ]

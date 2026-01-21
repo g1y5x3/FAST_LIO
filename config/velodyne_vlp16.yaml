@@ -7,7 +7,7 @@
         filter_size_map: 0.5
         cube_side_length: 1000.0
         runtime_pos_log_enable: true
-        map_file_path: "./mine_map3_test_0.pcd"
+        map_file_path: "./test.pcd"
 
         common:
             lid_topic:  "/velodyne_points"
@@ -35,7 +35,10 @@
             extrinsic_R: [1.0, 0.0, 0.0,
                           0.0, 1.0, 0.0,
                           0.0, 0.0, 1.0]
-        localization:
+
+        global_map:
+            map_frame_id: "map"
+            map_leaf_size: 0.1
             use_pmf: true
             pmf_max_window_size: 5.0
             pmf_slope: 1.0

@@ -9,26 +9,26 @@ GlobalMapServer::GlobalMapServer() : Node("global_map_server_node")
 
   // Parameters
   this->declare_parameter<std::string>("map_path", "");
-  this->declare_parameter<std::string>("map_frame_id", "camera_init");
-  this->declare_parameter<double>("map_leaf_size", 0.1);
+  this->declare_parameter<std::string>("global_map.map_frame_id", "camera_init");
+  this->declare_parameter<double>("global_map.map_leaf_size", 0.1);
   
   // PMF Parameters
-  this->declare_parameter<bool>("localization.use_pmf", true);
+  this->declare_parameter<bool>("global_map.use_pmf", true);
   // TODO: tune these defaults later
-  this->declare_parameter<double>("localization.pmf_max_window_size", 6.0);
-  this->declare_parameter<double>("localization.pmf_slope", 2.5);
-  this->declare_parameter<double>("localization.pmf_initial_distance", 0.8);
-  this->declare_parameter<double>("localization.pmf_max_distance", 1.0);
+  this->declare_parameter<double>("global_map.pmf_max_window_size", 6.0);
+  this->declare_parameter<double>("global_map.pmf_slope", 2.5);
+  this->declare_parameter<double>("global_map.pmf_initial_distance", 0.8);
+  this->declare_parameter<double>("global_map.pmf_max_distance", 1.0);
 
   this->get_parameter("map_path", this->map_path_);
-  this->get_parameter("map_frame_id", this->map_frame_id_);
-  this->get_parameter("map_leaf_size", this->map_leaf_size_);
-  this->get_parameter("localization.use_pmf", this->use_pmf_);
+  this->get_parameter("global_map.map_frame_id", this->map_frame_id_);
+  this->get_parameter("global_map.map_leaf_size", this->map_leaf_size_);
+  this->get_parameter("global_map.use_pmf", this->use_pmf_);
   
-  this->get_parameter("localization.pmf_max_window_size", this->pmf_max_window_size_);
-  this->get_parameter("localization.pmf_slope", this->pmf_slope_);
-  this->get_parameter("localization.pmf_initial_distance", this->pmf_initial_distance_);
-  this->get_parameter("localization.pmf_max_distance", this->pmf_max_distance_);
+  this->get_parameter("global_map.pmf_max_window_size", this->pmf_max_window_size_);
+  this->get_parameter("global_map.pmf_slope", this->pmf_slope_);
+  this->get_parameter("global_map.pmf_initial_distance", this->pmf_initial_distance_);
+  this->get_parameter("global_map.pmf_max_distance", this->pmf_max_distance_);
 
   // Publisher (Latched)
   rclcpp::QoS qos_profile(1);
