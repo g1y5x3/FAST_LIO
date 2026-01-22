@@ -3,5 +3,3 @@ log/*.txt
 log/*.csv
 log/*.pdf
 pcd/*.pcd
-.vscode/settings.json
-.vscode/c_cpp_properties.json
