@@ -53,6 +53,9 @@ LocalizationNode::LocalizationNode() : Node("localization_node")
   // Initial Pose
   this->initial_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
       "/initialpose", 1, std::bind(&LocalizationNode::initialPoseCallback, this, std::placeholders::_1));
+
+  // Publisher
+  this->pub_odom_ = this->create_publisher<nav_msgs::msg::Odometry>("/odometry_global", 10);
 }
 
 LocalizationNode::~LocalizationNode() {}
@@ -96,6 +99,41 @@ void LocalizationNode::odomCallback(const nav_msgs::msg::Odometry::ConstSharedPt
   tf_msg.transform = tf2::eigenToTransform(map_to_odom_d).transform;
 
   this->tf_broadcaster_->sendTransform(tf_msg);
+
+  // Publish Odometry in Map Frame
+  nav_msgs::msg::Odometry odom_map = *msg;
+  odom_map.header.frame_id = this->global_frame_id_;
+  odom_map.child_frame_id = this->base_frame_id_;
+
+  // Transform Pose (T_map_base = T_map_odom * T_odom_base)
+  Eigen::Matrix4f map_pose_curr = map_to_odom_curr * this->odom_to_base_;
+  Eigen::Isometry3d map_pose_d(map_pose_curr.cast<double>());
+  
+  // Fill Pose
+  geometry_msgs::msg::Pose pose_msg = tf2::toMsg(map_pose_d);
+  odom_map.pose.pose = pose_msg;
+
+  // Rotate Covariance (P_map = R * P_odom * R^T)
+  // Assuming covariance is 6x6 (XYZ, RPY)
+  Eigen::Matrix3d R = map_to_odom_d.rotation();
+  
+  // Copy covariance to Eigen matrix for easy manipulation
+  Eigen::Matrix<double, 6, 6> P_odom = Eigen::Matrix<double, 6, 6>::Zero();
+  for(int i=0; i<36; i++) P_odom(i/6, i%6) = msg->pose.covariance[i];
+
+  Eigen::Matrix<double, 6, 6> P_map = Eigen::Matrix<double, 6, 6>::Zero();
+  
+  // Rotate Position Covariance
+  P_map.block<3,3>(0,0) = R * P_odom.block<3,3>(0,0) * R.transpose();
+  // Rotate Orientation Covariance
+  P_map.block<3,3>(3,3) = R * P_odom.block<3,3>(3,3) * R.transpose();
+  // Rotate Cross-Covariance
+  P_map.block<3,3>(0,3) = R * P_odom.block<3,3>(0,3) * R.transpose();
+  P_map.block<3,3>(3,0) = R * P_odom.block<3,3>(3,0) * R.transpose();
+
+  for(int i=0; i<36; i++) odom_map.pose.covariance[i] = P_map(i/6, i%6);
+
+  this->pub_odom_->publish(odom_map);
 }
 
 void LocalizationNode::scanCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr msg)
