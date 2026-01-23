@@ -113,6 +113,39 @@ void GlobalMapServer::loadAndFilterMap()
     for (int index : ground_indices->indices) {
       downsampled_map->points[index].intensity = 0.0f;
     }
+
+    // Ceiling Segmentation (Inverted PMF)
+    // To handle sloping tunnels, we flip the world upside down and run PMF again.
+    // The "ground" of the upside-down world is the "ceiling" of the real world.
+    
+    RCLCPP_INFO(this->get_logger(), "Applying Inverted PMF for Ceiling Segmentation...");
+    
+    pcl::PointCloud<PointType>::Ptr inverted_map(new pcl::PointCloud<PointType>());
+    *inverted_map = *downsampled_map;
+    
+    // Invert Z coordinates
+    for (auto& pt : inverted_map->points) {
+        pt.z = -pt.z;
+    }
+
+    pcl::PointIndices::Ptr ceiling_indices(new pcl::PointIndices);
+    pcl::ApproximateProgressiveMorphologicalFilter<PointType> pmf_ceiling;
+    pmf_ceiling.setInputCloud(inverted_map);
+    // We use the same parameters as ground, or maybe slightly relaxed
+    pmf_ceiling.setMaxWindowSize(this->pmf_max_window_size_);
+    pmf_ceiling.setSlope(this->pmf_slope_);
+    pmf_ceiling.setInitialDistance(this->pmf_initial_distance_);
+    pmf_ceiling.setMaxDistance(this->pmf_max_distance_); // Max distance from the "surface" (ceiling)
+    pmf_ceiling.extract(ceiling_indices->indices);
+
+    RCLCPP_INFO(this->get_logger(), "Ceiling PMF complete. Found %zu ceiling points.", ceiling_indices->indices.size());
+
+    // Mark ceiling points as safe (0.0)
+    for (int index : ceiling_indices->indices) {
+      downsampled_map->points[index].intensity = 0.0f;
+    }
+    // ---------------------------------------------------------
+
   } else {
     // If no PMF, assume everything is obstacle? or keep original intensity?
     // Let's set everything to 1.0 (Obstacle) to be safe for planning
