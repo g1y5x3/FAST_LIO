@@ -110,14 +110,14 @@ target_include_directories(fastlio_mapping PUBLIC
 target_link_libraries(fastlio_mapping ${PCL_LIBRARIES} ${PYTHON_LIBRARIES} Eigen3::Eigen)
 target_include_directories(fastlio_mapping PRIVATE ${PYTHON_INCLUDE_DIRS})
 
-add_executable(global_map_server src/global_map_server.cpp)
-target_include_directories(global_map_server PUBLIC
+add_executable(terrain_processor src/terrain_processor.cpp)
+target_include_directories(terrain_processor PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
   ${PCL_INCLUDE_DIRS}
 )
-target_link_libraries(global_map_server ${PCL_LIBRARIES})
-ament_target_dependencies(global_map_server ${dependencies})
+target_link_libraries(terrain_processor ${PCL_LIBRARIES})
+ament_target_dependencies(terrain_processor ${dependencies})
 
 add_executable(localization_node src/localization.cpp)
 target_include_directories(localization_node PUBLIC
@@ -144,7 +144,7 @@ endif()
 ament_target_dependencies(fastlio_mapping ${dependencies})
 
 # ---------------- Install --------------- #
-install(TARGETS fastlio_mapping global_map_server localization_node
+install(TARGETS fastlio_mapping terrain_processor localization_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
