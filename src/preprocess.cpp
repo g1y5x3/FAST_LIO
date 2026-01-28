@@ -470,14 +470,8 @@ void Preprocess::velodyne_handler(const sensor_msgs::msg::PointCloud2::UniquePtr
       {
         if (added_pt.x * added_pt.x + added_pt.y * added_pt.y + added_pt.z * added_pt.z > (blind * blind))
         {
-                    // Filter out points above 2.0 meters (LiDAR frame)
-                    if (added_pt.z > 2.0) continue;
-
-                    // Filter out points in the rear 30-degree cone (approx +-15 deg around 180)
-                    // 15 deg ~= 0.26 rad. PI - 0.26 = 2.88
-                    // if (std::abs(atan2(added_pt.y, added_pt.x)) > 2.88) continue;
-
-                    pl_surf.points.push_back(added_pt);        }
+          pl_surf.points.push_back(added_pt);
+        }
       }
     }
   }
