@@ -23,7 +23,7 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <tf2_eigen/tf2_eigen.hpp>
 
-using PointType = pcl::PointXYZI;
+using PointType = pcl::PointXYZ;
 
 namespace fast_lio
 {
@@ -41,15 +41,12 @@ private:
   void scanCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr msg);
   void initialPoseCallback(const geometry_msgs::msg::PoseWithCovarianceStamped::ConstSharedPtr msg);
 
-  // Helpers
-  void processLocalization(const pcl::PointCloud<PointType>::Ptr& scan_ptr, const rclcpp::Time& stamp);
-
   // ROS
   rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr map_sub_;
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
   rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr scan_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr initial_pose_sub_;
-  
+
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pub_odom_;
 
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
@@ -59,13 +56,13 @@ private:
   // Data
   pcl::PointCloud<PointType>::Ptr global_map_;
   pcl::NormalDistributionsTransform<PointType, PointType> ndt_;
-  
+
   // State
-  Eigen::Matrix4f map_to_odom_; // Transform from map -> odom (camera_init)
-  Eigen::Matrix4f odom_to_base_; // Current odom -> base_link
+  Eigen::Matrix4f map_to_odom_;   // map -> odom
+  Eigen::Matrix4f odom_to_base_;  // (current) odom -> base_link
   bool map_initialized_ = false;
   bool initial_pose_received_ = false;
-  
+
   // Buffers
   std::mutex mutex_;
   nav_msgs::msg::Odometry latest_odom_;

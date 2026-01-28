@@ -8,7 +8,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     package_name = 'fast_lio'
-    
+
     # Arguments
     map_path_arg = DeclareLaunchArgument(
         'map_path',
@@ -38,18 +38,19 @@ def generate_launch_description():
         description='FAST-LIO config file name (must be in config folder)'
     )
 
-    # 1. Global Map Server
-    # load the YAML file but override specific params for localization mode
+    # FAST-LIO config path
     fast_lio_config_path = PathJoinSubstitution([
         get_package_share_directory(package_name),
         'config',
         LaunchConfiguration('config_file')
     ])
 
-    map_server_node = Node(
+    # 1. Terrain Processor
+    # Handles ground/ceiling filtering and publishes static map topics
+    terrain_processor_node = Node(
         package=package_name,
-        executable='global_map_server',
-        name='global_map_server',
+        executable='terrain_processor',
+        name='terrain_processor',
         output='screen',
         parameters=[
             fast_lio_config_path,
@@ -60,7 +61,7 @@ def generate_launch_description():
         ]
     )
 
-    # 2. FAST-LIO (Odometry Mode)
+    # 2. FAST-LIO
     fast_lio_node = Node(
         package=package_name,
         executable='fastlio_mapping',
@@ -81,7 +82,8 @@ def generate_launch_description():
         ]
     )
 
-    # 3. Localization Node (NDT)
+    # 3. Localization Node
+    # Subscribes to global_map published by terrain_processor
     localization_node = Node(
         package=package_name,
         executable='localization_node',
@@ -90,7 +92,7 @@ def generate_launch_description():
         parameters=[
             fast_lio_config_path,
             {
-                'use_sim_time': LaunchConfiguration('use_sim_time')
+                'use_sim_time': LaunchConfiguration('use_sim_time'),
             }
         ]
     )
@@ -121,7 +123,7 @@ def generate_launch_description():
         use_sim_time_arg,
         publish_goals_arg,
         config_file_arg,
-        map_server_node,
+        terrain_processor_node,
         fast_lio_node,
         localization_node,
         goal_publisher_node,

@@ -5,7 +5,7 @@ namespace fast_lio
 
 LocalizationNode::LocalizationNode() : Node("localization_node")
 {
-  RCLCPP_INFO(this->get_logger(), "Initializing FAST-LIO Localization Node");
+  RCLCPP_INFO(this->get_logger(), "Initializing FAST-LIO Localization Node ...");
 
   // Parameters
   this->declare_parameter<std::string>("localization.global_frame_id", "map");
@@ -34,12 +34,11 @@ LocalizationNode::LocalizationNode() : Node("localization_node")
   this->odom_to_base_ = Eigen::Matrix4f::Identity();
   this->global_map_.reset(new pcl::PointCloud<PointType>());
 
-  // Subscribers
-  // Map: Transient Local to match GlobalMapServer
-  rclcpp::QoS map_qos(1);
-  map_qos.transient_local();
+  // Map Subscription (Latched)
+  rclcpp::QoS qos_profile(1);
+  qos_profile.transient_local();
   this->map_sub_ = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-      "global_map", map_qos, std::bind(&LocalizationNode::mapCallback, this, std::placeholders::_1));
+      "global_map", qos_profile, std::bind(&LocalizationNode::mapCallback, this, std::placeholders::_1));
 
   // Odom: High frequency
   this->odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>(
@@ -62,18 +61,23 @@ LocalizationNode::~LocalizationNode() {}
 
 void LocalizationNode::mapCallback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr msg)
 {
-  RCLCPP_INFO(this->get_logger(), "Received Global Map. Initializing NDT...");
+  if (this->map_initialized_) return;
+
+  RCLCPP_INFO(this->get_logger(), "Received Global Map from topic. Points: %d", msg->width * msg->height);
+
   pcl::fromROSMsg(*msg, *this->global_map_);
+
+  RCLCPP_INFO(this->get_logger(), "Map received with %zu points. Building NDT...", this->global_map_->size());
 
   // NDT Setup
   this->ndt_.setResolution(this->ndt_resolution_);
   this->ndt_.setStepSize(this->ndt_step_size_);
   this->ndt_.setTransformationEpsilon(this->ndt_trans_epsilon_);
   this->ndt_.setMaximumIterations(this->ndt_max_iter_);
-  
+
   this->ndt_.setInputTarget(this->global_map_);
   this->map_initialized_ = true;
-  RCLCPP_INFO(this->get_logger(), "NDT Initialized with %zu points.", this->global_map_->size());
+  RCLCPP_INFO(this->get_logger(), "NDT Target Map Set.");
 }
 
 void LocalizationNode::odomCallback(const nav_msgs::msg::Odometry::ConstSharedPtr msg)
@@ -88,7 +92,6 @@ void LocalizationNode::odomCallback(const nav_msgs::msg::Odometry::ConstSharedPt
   this->odom_to_base_ = odom_to_base_d.cast<float>().matrix();
 
   // Publish TF immediately using the latest known map_to_odom correction
-  // This ensures high-rate TF even if NDT is slower
   geometry_msgs::msg::TransformStamped tf_msg;
   tf_msg.header.stamp = msg->header.stamp;
   tf_msg.header.frame_id = this->global_frame_id_;
@@ -108,21 +111,20 @@ void LocalizationNode::odomCallback(const nav_msgs::msg::Odometry::ConstSharedPt
   // Transform Pose (T_map_base = T_map_odom * T_odom_base)
   Eigen::Matrix4f map_pose_curr = map_to_odom_curr * this->odom_to_base_;
   Eigen::Isometry3d map_pose_d(map_pose_curr.cast<double>());
-  
+
   // Fill Pose
   geometry_msgs::msg::Pose pose_msg = tf2::toMsg(map_pose_d);
   odom_map.pose.pose = pose_msg;
 
   // Rotate Covariance (P_map = R * P_odom * R^T)
-  // Assuming covariance is 6x6 (XYZ, RPY)
   Eigen::Matrix3d R = map_to_odom_d.rotation();
-  
+
   // Copy covariance to Eigen matrix for easy manipulation
   Eigen::Matrix<double, 6, 6> P_odom = Eigen::Matrix<double, 6, 6>::Zero();
   for(int i=0; i<36; i++) P_odom(i/6, i%6) = msg->pose.covariance[i];
 
   Eigen::Matrix<double, 6, 6> P_map = Eigen::Matrix<double, 6, 6>::Zero();
-  
+
   // Rotate Position Covariance
   P_map.block<3,3>(0,0) = R * P_odom.block<3,3>(0,0) * R.transpose();
   // Rotate Orientation Covariance
@@ -167,10 +169,10 @@ void LocalizationNode::scanCallback(const sensor_msgs::msg::PointCloud2::ConstSh
   // 3. Update Correction
   if (this->ndt_.hasConverged()) {
       Eigen::Matrix4f T_map_base_opt = this->ndt_.getFinalTransformation();
-      
+
       // Recalculate T_map_odom = T_map_base_opt * T_odom_base^-1
       this->map_to_odom_ = T_map_base_opt * odom_to_base_curr.inverse();
-      
+
       RCLCPP_DEBUG(this->get_logger(), "NDT Converged. Score: %.4f", this->ndt_.getFitnessScore());
   } else {
       RCLCPP_WARN(this->get_logger(), "NDT Diverged!");
@@ -191,7 +193,7 @@ void LocalizationNode::initialPoseCallback(const geometry_msgs::msg::PoseWithCov
       std::lock_guard<std::mutex> lock(this->mutex_);
       odom_to_base_curr = this->odom_to_base_;
   }
-  
+
   this->map_to_odom_ = initial_pose * odom_to_base_curr.inverse();
   this->initial_pose_received_ = true;
   RCLCPP_INFO(this->get_logger(), "Localization Reset.");
