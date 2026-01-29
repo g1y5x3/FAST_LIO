@@ -79,6 +79,9 @@ def generate_launch_description():
                 'publish.scan_bodyframe_pub_en': True,
                 'publish.dense_publish_en': False,
             }
+        ],
+        remappings=[
+            ('/Odometry', '/odometry_lio')
         ]
     )
 

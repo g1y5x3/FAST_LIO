@@ -26,8 +26,6 @@ LocalizationNode::LocalizationNode() : Node("localization_node")
 
   // TF
   this->tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
-  this->tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
-  this->tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*this->tf_buffer_);
 
   // Initialize State
   this->map_to_odom_ = Eigen::Matrix4f::Identity();
@@ -38,11 +36,11 @@ LocalizationNode::LocalizationNode() : Node("localization_node")
   rclcpp::QoS qos_profile(1);
   qos_profile.transient_local();
   this->map_sub_ = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-      "global_map", qos_profile, std::bind(&LocalizationNode::mapCallback, this, std::placeholders::_1));
+      "/global_map", qos_profile, std::bind(&LocalizationNode::mapCallback, this, std::placeholders::_1));
 
   // Odom: High frequency
   this->odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>(
-      "/Odometry", 10, std::bind(&LocalizationNode::odomCallback, this, std::placeholders::_1));
+      "/odometry_lio", 10, std::bind(&LocalizationNode::odomCallback, this, std::placeholders::_1));
 
   // Scan: Use undistorted body frame cloud from FAST-LIO
   // Note: /cloud_registered_body is usually cleaner for matching
@@ -54,7 +52,7 @@ LocalizationNode::LocalizationNode() : Node("localization_node")
       "/initialpose", 1, std::bind(&LocalizationNode::initialPoseCallback, this, std::placeholders::_1));
 
   // Publisher
-  this->pub_odom_ = this->create_publisher<nav_msgs::msg::Odometry>("/odometry_global", 10);
+  this->pub_odom_ = this->create_publisher<nav_msgs::msg::Odometry>("/odometry_map", 10);
 }
 
 LocalizationNode::~LocalizationNode() {}
@@ -182,7 +180,7 @@ void LocalizationNode::scanCallback(const sensor_msgs::msg::PointCloud2::ConstSh
 void LocalizationNode::initialPoseCallback(const geometry_msgs::msg::PoseWithCovarianceStamped::ConstSharedPtr msg)
 {
   RCLCPP_INFO(this->get_logger(), "Received Initial Pose.");
-  
+
   Eigen::Isometry3d initial_pose_d;
   tf2::fromMsg(msg->pose.pose, initial_pose_d);
   Eigen::Matrix4f initial_pose = initial_pose_d.cast<float>().matrix(); // T_map_base
