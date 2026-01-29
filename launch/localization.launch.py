@@ -48,7 +48,7 @@ def generate_launch_description():
     # 1. Terrain Processor
     # Handles ground/ceiling filtering and publishes static map topics
     terrain_processor_node = Node(
-        package=package_name,
+        package='terrain_analysis',
         executable='terrain_processor',
         name='terrain_processor',
         output='screen',
