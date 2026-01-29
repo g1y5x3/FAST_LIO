@@ -23,9 +23,6 @@
 
 using PointType = pcl::PointXYZ;
 
-namespace fast_lio
-{
-
 class LocalizationNode : public rclcpp::Node
 {
 public:
@@ -73,5 +70,3 @@ private:
   double ndt_trans_epsilon_;
   int ndt_max_iter_;
 };
-
-} // namespace fast_lio

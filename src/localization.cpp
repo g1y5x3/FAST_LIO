@@ -1,8 +1,5 @@
 #include "localization.h"
 
-namespace fast_lio
-{
-
 LocalizationNode::LocalizationNode() : Node("localization_node")
 {
   RCLCPP_INFO(this->get_logger(), "Initializing FAST-LIO Localization Node ...");
@@ -197,12 +194,10 @@ void LocalizationNode::initialPoseCallback(const geometry_msgs::msg::PoseWithCov
   RCLCPP_INFO(this->get_logger(), "Localization Reset.");
 }
 
-} // namespace fast_lio
-
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<fast_lio::LocalizationNode>();
+  auto node = std::make_shared<LocalizationNode>();
   rclcpp::spin(node);
   rclcpp::shutdown();
   return 0;

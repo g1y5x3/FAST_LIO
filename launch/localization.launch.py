@@ -10,6 +10,12 @@ def generate_launch_description():
     package_name = 'fast_lio'
 
     # Arguments
+    use_sim_time_arg = DeclareLaunchArgument(
+        'use_sim_time',
+        default_value='false',
+        description='Use simulation (bag) time if true'
+    )
+
     map_path_arg = DeclareLaunchArgument(
         'map_path',
         default_value=os.path.join(
@@ -18,12 +24,6 @@ def generate_launch_description():
             'mine_map3_final_clean.pcd'
         ),
         description='Path to the global PCD map file'
-    )
-
-    use_sim_time_arg = DeclareLaunchArgument(
-        'use_sim_time',
-        default_value='false',
-        description='Use simulation (bag) time if true'
     )
 
     publish_goals_arg = DeclareLaunchArgument(
@@ -58,6 +58,9 @@ def generate_launch_description():
                 'map_path': LaunchConfiguration('map_path'),
                 'use_sim_time': LaunchConfiguration('use_sim_time')
             }
+        ],
+        remappings=[
+            ('/scan_cloud', '/cloud_registered_body')
         ]
     )
 
