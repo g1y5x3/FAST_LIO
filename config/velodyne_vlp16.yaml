@@ -3,6 +3,7 @@
         # frame id settings
         odom_frame_id: "camera_init"
         base_frame_id: "base_link"
+        map_frame_id:  "map"
 
         # icp settings
         feature_extract_enable: false
@@ -21,19 +22,19 @@
             time_offset_lidar_to_imu: 0.0
 
         preprocess:
-            lidar_type: 2                # 2 for Velodyne
+            lidar_type: 2                 # 2 for Velodyne in fast_lio
             scan_line: 16
-            scan_rate: 10                # Hz
-            timestamp_unit: 0            # Check if your driver uses s (0) ms (1) or us (2)
-            blind: 2.0
+            scan_rate: 10                 # Hz
+            timestamp_unit: 0             # Check if your driver uses s (0) ms (1) or us (2)
+            blind: 0.75                   # avoid points on the vehicle
 
         mapping:
             acc_cov: 0.1
             gyr_cov: 0.1
             b_acc_cov: 0.0001
             b_gyr_cov: 0.0001
-            fov_degree: 360.0
-            det_range: 80.0
+            fov_degree: 360.0             # NOTE: not being used
+            det_range: 75.0
             extrinsic_est_en:  false      # Online refinement of extrinsics
             # Transform from LiDAR to IMU
             extrinsic_T: [-0.186, 0.000, 0.086]
@@ -46,20 +47,20 @@
             interval: -1
 
         global_cloud:
-            map_frame_id: "map"
             map_leaf_size: 0.1
 
         terrain_cloud:
             use_pmf: true
             pmf_max_window_size: 5.0
-            pmf_slope: 0.8
-            pmf_initial_distance: 0.5
+            pmf_slope: 0.25
+            pmf_initial_distance: 0.3
             pmf_max_distance: 1.0
             ceiling_height_threshold: 1.5
+            filter_operator_fov: true
+            operator_fov_deg: 120.0
 
         localization:
-            global_frame_id: "map"
             ndt_resolution: 1.0
             ndt_step_size: 0.1
-            ndt_trans_epsilon: 0.01
+            ndt_trans_epsilon: 0.005
             ndt_max_iter: 30

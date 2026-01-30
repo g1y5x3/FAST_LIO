@@ -103,7 +103,7 @@ Visualization Manager:
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.03999999910593033
+      Size (m): 0.02500000037252903
       Style: Flat Squares
       Topic:
         Depth: 5
@@ -177,7 +177,7 @@ Visualization Manager:
         Color: 0; 255; 0
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
-        Shaft Length: 1
+        Shaft Length: 0.5
         Shaft Radius: 0.05000000074505806
         Value: Arrow
       Topic:
@@ -246,9 +246,9 @@ Visualization Manager:
       Pitch: 1.5697963237762451
       Point towards: -z axis
       Position:
-        X: -0.03839908912777901
+        X: 0
         Y: 0
-        Z: 38.39997482299805
+        Z: 40
       Target Frame: base_link
       Value: FrameAligned (rviz_default_plugins)
       Yaw: 0
