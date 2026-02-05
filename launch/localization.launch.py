@@ -69,7 +69,7 @@ def generate_launch_description():
     fast_lio_node = Node(
         package=package_name,
         executable="fastlio_mapping",
-        name="fastlio_mapping",
+        name="fast_lio",
         output="screen",
         parameters=[
             fast_lio_config_path,
@@ -92,7 +92,7 @@ def generate_launch_description():
     localization_node = Node(
         package=package_name,
         executable="fast_lio_localization_node",
-        name="localization_node",
+        name="ndt_localization",
         output="screen",
         parameters=[
             fast_lio_config_path,
