@@ -146,7 +146,7 @@ install(PROGRAMS
 )
 
 install(
-  DIRECTORY config launch rviz pcd scripts
+  DIRECTORY config rviz scripts
   DESTINATION share/${PROJECT_NAME}
 )
 
