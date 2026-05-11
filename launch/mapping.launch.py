@@ -17,7 +17,7 @@ def generate_launch_description():
 
     config_file_arg = DeclareLaunchArgument(
         "config_file",
-        default_value="velodyne_vlp16.yaml",
+        default_value="velodyne_vlp32.yaml",
         description="Config file name (in fast_lio/config folder)",
     )
 

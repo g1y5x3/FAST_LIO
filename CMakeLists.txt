@@ -146,7 +146,7 @@ install(PROGRAMS
 )
 
 install(
-  DIRECTORY config rviz scripts
+  DIRECTORY config launch rviz scripts
   DESTINATION share/${PROJECT_NAME}
 )
 
